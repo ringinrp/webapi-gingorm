@@ -13,6 +13,7 @@ func main() {
 	router.GET("/hello", helloHandler)
 	router.GET("/books/:id", booksHandler)
 	router.GET("/query", queryHandler)
+	router.POST("/query", queryHandler)
 
 	router.Run(":8000")
 
@@ -39,7 +40,8 @@ func booksHandler(c *gin.Context) {
 }
 
 func queryHandler(c *gin.Context) {
-	id := c.Param("id")
+	title := c.Query("title")
+	price := c.Query("price")
 
-	c.JSON(http.StatusOK, gin.H{"id": id})
+	c.JSON(http.StatusOK, gin.H{"id": title, "price": price})
 }
