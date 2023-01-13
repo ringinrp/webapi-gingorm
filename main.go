@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"webapi-gingorm/book"
 	"webapi-gingorm/handler"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +18,26 @@ func main() {
 		log.Fatal("DB Connection Error")
 	}
 
-	// db.AutoMigrate(&book.Book{})
+	db.AutoMigrate(&book.Book{})
 
-	//CREATE
+	bookRepository := book.NewRepository(db)
+	// book, err := bookRepository.FindByID(6)
+
+	// fmt.Println("Title:", book.Title)
+	bookService := book.NewService(bookRepository)
+	bookHandler := handler.NewBookHandler(bookService)
+
+	// bookRequest := book.BookRequest{
+	// 	Title: "Gundam",
+	// 	Price: "57000",
+	// }
+
+	// bookService.Create(bookRequest)
+
+	//================================================================
+	//CREATE DATA
+	//================================================================
+
 	//STRUCT
 	// book := book.Book{}
 	// book.Title = "Naruto Shippuden"
@@ -32,7 +50,11 @@ func main() {
 	// if err != nil {
 	// 	fmt.Println("Error Creating Book")
 	// }
+	//===============================================================
 
+	//================================================================
+	//READ DATA
+	//================================================================
 	//Menampil suatu data /satu data
 	// var book book.Book
 	// err = db.Debug().First(&book, 6).Error // [First] menampilkan data pertama (awal). [Last] menampilkan data terakhir
@@ -63,16 +85,45 @@ func main() {
 	// 	fmt.Println("Title :", b.Title)
 	// 	fmt.Println("book object %v", b)
 	// }
+	//===============================================================
+
+	//================================================================
+	//UPDATE DATA
+	//================================================================
+	// var book book.Book
+	// err = db.Debug().Where("id =?", 1).First(&book).Error
+	// if err != nil {
+	// 	fmt.Println("Error Finding Book")
+	// }
+	// book.Title = "antomic habit"
+	// err = db.Save(&book).Error
+	// if err != nil {
+	// 	fmt.Println("Error updating Book")
+	// }
+	//================================================================
+
+	//================================================================
+	//DELETE DATA
+	//================================================================
+	// var book book.Book
+	// err = db.Debug().Where("id =?", 1).First(&book).Error
+	// if err != nil {
+	// 	fmt.Println("Error Finding Book")
+	// }
+	// err = db.Delete(&book).Error
+	// if err != nil {
+	// 	fmt.Println("Error Deleting Book")
+	// }
 
 	router := gin.Default()
 
 	v1 := router.Group("/v1")
 
-	v1.GET("/", handler.RouteHandler)
-	v1.GET("/hello", handler.HelloHandler)
-	v1.GET("/books/:id", handler.BooksHandler)
-	v1.GET("/query", handler.QueryHandler)
-	v1.POST("/books", handler.PostBooksHandler)
+	v1.GET("/", bookHandler.RouteHandler)
+	v1.GET("/hello", bookHandler.HelloHandler)
+	v1.GET("/books/:id", bookHandler.BooksHandler)
+	v1.GET("/query", bookHandler.QueryHandler)
+	v1.POST("/books", bookHandler.PostBooksHandler)
 
 	router.Run(":8000")
 
